@@ -2,9 +2,9 @@ import os
 import logging
 import requests
 import telebot
-from urllib.parse import urlparse, parse_qs, quote
-
+from urllib.parse import quote
 from flask import Flask
+import threading
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,11 +15,11 @@ API_BASE_URL = "https://bio.ffutils.tech/api/update_bio"
 if not BOT_TOKEN:
     raise Exception("BOT_TOKEN not set")
 
-bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None)
-
+bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
 
+# ---------------- API CALL ----------------
 def call_bio_api(token, bio):
     try:
         url = f"{API_BASE_URL}?access_token={token}&bio={quote(bio)}&key={API_KEY}"
@@ -29,41 +29,52 @@ def call_bio_api(token, bio):
         return {"status": "error", "message": str(e)}
 
 
+# ---------------- TELEGRAM HANDLERS ----------------
 @bot.message_handler(commands=["start"])
 def start(msg):
-    bot.send_message(msg.chat.id, "👋 Bot is working!")
+    bot.send_message(msg.chat.id, "👋 Bot is running on Render!")
 
 
 @bot.message_handler(commands=["bio"])
 def bio(msg):
     try:
         parts = msg.text.split(" ", 2)
+
         if len(parts) < 3:
-            bot.send_message(msg.chat.id, "Use: /bio token text")
+            bot.send_message(msg.chat.id, "❌ Use: /bio <token> <bio text>")
             return
 
         token = parts[1]
         bio_text = parts[2]
 
-        bot.send_message(msg.chat.id, "⏳ Updating...")
+        bot.send_message(msg.chat.id, "⏳ Updating bio...")
 
         result = call_bio_api(token, bio_text)
 
         if result.get("status") == "success":
-            bot.send_message(msg.chat.id, "✅ Bio updated!")
+            bot.send_message(msg.chat.id, "✅ Bio updated successfully!")
         else:
-            bot.send_message(msg.chat.id, f"❌ Failed: {result}")
+            bot.send_message(msg.chat.id, f"❌ Failed: {result.get('message')}")
 
     except Exception as e:
         bot.send_message(msg.chat.id, f"Error: {e}")
 
 
+# ---------------- FLASK ROUTES ----------------
 @app.route("/")
 def home():
-    return "Bot Running"
+    return "✅ Bot is running"
 
 
-# 🔥 IMPORTANT FIX (THIS IS THE KEY)
-if __name__ == "__main__":
-    print("Bot starting...")
-    bot.infinity_polling(skip_pending=True)
+@app.route("/health")
+def health():
+    return {"status": "ok"}
+
+
+# ---------------- RUN BOTH (FIX) ----------------
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+
+def run
